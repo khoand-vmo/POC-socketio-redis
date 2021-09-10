@@ -1,0 +1,5 @@
+app/node_modules
+app/package-lock.json
+
+socket-sevice/node_modules
+socket-sevice/package-lock.json
