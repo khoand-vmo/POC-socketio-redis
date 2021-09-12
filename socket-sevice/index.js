@@ -1,15 +1,21 @@
-// const io = require("socket.io")({
-//     path: "/test",
-//     serveClient: false,
-// });
-  
-//   // either
-//   const server = require("http").createServer();
-  
-//   io.attach(server, {
-//     pingInterval: 10000,
-//     pingTimeout: 5000,
-//     cookie: false
-//   });
-  
-//   server.listen(3001);
+const { Server } = require("socket.io");
+const { createAdapter } = require("@socket.io/redis-adapter");
+const { createClient } = require("redis");
+
+const io = new Server({
+  cors: {
+    origin: "*",
+  },
+});
+
+const pubClient = createClient({ host: "localhost", port: 6379 });
+const subClient = pubClient.duplicate();
+
+io.adapter(createAdapter(pubClient, subClient));
+io.listen(3003);
+
+io.on("connection", (socket) => {
+  socket.on("client:message", (msg) => {
+    console.log("client:message: ", msg);
+  });
+});
