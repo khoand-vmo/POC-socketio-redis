@@ -9,13 +9,19 @@ const io = new Server({
 });
 
 const pubClient = createClient({ host: "localhost", port: 6379 });
-const subClient = pubClient.duplicate();
+// const subClient = pubClient.duplicate();
 
-io.adapter(createAdapter(pubClient, subClient));
+// io.adapter(createAdapter(pubClient, subClient));
 io.listen(3003);
 
 io.on("connection", (socket) => {
   socket.on("client:message", (msg) => {
     console.log("client:message: ", msg);
+    pubClient.publish("publish-camera", JSON.stringify({message: msg}));
   });
+
+  console.log('connected ', socket.id)
+  const user = {userId: 123, eventId: 91};
+  // pubClient.lpush("auth", JSON.stringify(user));
+  pubClient.publish("user-auth", JSON.stringify(user));
 });

@@ -5,6 +5,8 @@ const { Emitter } = require("@socket.io/redis-emitter");
 const { createClient } = require("redis");
 
 const redisClient = createClient({ host: "localhost", port: 6379 });
+
+const subscriber = createClient({ host: "localhost", port: 6379 });
 const emitter = new Emitter(redisClient);
 
 app.use(
@@ -41,7 +43,6 @@ app.get("/users", (req, res) => {
 app.post("/users", (req, res) => {
   const { name, age } = req.body;
   const newUser = { name, age };
-  const io = req.app.get("connections");
   users.push(newUser);
   emitter.emit("data-change", newUser);
   res.json({
@@ -55,3 +56,19 @@ var server = app.listen(3000, function () {
 
   console.log("Example app listening at http://%s:%s", host, port);
 });
+
+
+subscriber.lpop("auth", (message) => {
+  console.log('list pop ', message);
+});
+
+
+try {
+  subscriber.on("message", (channel, message) => {
+    console.log(`Received data ${channel}:` + message)
+  })
+  subscriber.subscribe("user-auth")
+  subscriber.subscribe("client-message")
+} catch (error) {
+  console.log('error === ', error)
+}

@@ -1,0 +1,50 @@
+Tao socket service
+Dung redis
+
+User status
+    - Socket-service handle client connect to socket: push to redis(check auth)
+    - Vin backend handle client connect check attendee auth: join room({eventId}-users), update user status.
+    - Vin backend Emit list user status to room.
+Direct call:
+    - Socket-service handle client make direct call: get partner socket -> push to redis(create meeting room)
+    - Vin backend handle make direct call create meeting room -> emit to partner -> update user status
+    - Socket-service handle accept direct call: Emit to partner -> update user status
+    - Socket-service handle cancel direct call: Emit to partner -> update user status
+    - Socket-service handle end direct call: Emit to partner -> update user status -> push to redis(delete meeting room)
+    - Vin backend delete meeting room.
+Workshop:
+    Socket-service handle pre join workshop
+    Vin backend handle pre join check sessionId, check capacity limit, emit can join status, generate token.
+    Socket-service handle join workshop.
+    Vin backend handle join check capacity size, update workshop storage, update user status, join room, emit workshop info.
+    Socket-service handle out workshop: update workshop status, update user status, leave room, emit workshop info.
+    Socket-service handle pre publish camera: check camera limit, emit can publish camera status
+    Socket-service handle publish camera: check camera limit, emit can pre publish status, update workshop info, emit result publish camera, emit workshop info.
+    Socket-service un publish camera
+    Socket-service turn off camera
+    Socket-service handle kick
+    Socket-service handle turn off camera
+    Socket-service handle turn off other camera
+    Socket-service handle turn off other mic
+Main stage:
+    Giong workshop
+    Socket-service handle force pin
+    Socket-service handle turn off share screen
+    API start recording emit to moderator status recording
+    API stop recording emit to moderator status recording
+    API update composition emit to room new layout
+Breakout:
+    Giong main stage
+API emit to client:
+    poll Q&A service
+    API List attendee
+    API analytic
+    API enter event
+    API create order
+    API update ticker holder status
+
+
+
+
+
+  
